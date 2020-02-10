@@ -1,0 +1,142 @@
+<html>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"/>
+<script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+<body>
+  
+<div id="mydiv"></div>
+
+<script type="text/babel">
+class Hello extends React.Component {
+    constructor(props){
+        super(props)
+        this.state = {
+            todoItem : '',
+            items : [],
+            willBeDeleted: [],
+            deletedItems: [],
+            aw : false
+        }
+    }
+
+    handleTest(a){ //old style function
+        console.log("worked"); //klo gini doang ntar reload submitnya
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault() //biar gk reload
+        this.setState({
+            // items: this.state.items.concat([this.state.todoItem]) old style concat array
+            items: [...this.state.items, this.state.todoItem],
+            todoItem: '' 
+        })
+        console.log(this.state.items);
+    }
+
+    handleChange = (event) => {
+        if (event.target.value === "") {
+            document.title = "Ketik trus add"
+        }
+        else {
+            document.title = event.target.value
+        }
+
+        this.setState({
+            todoItem: event.target.value
+        })
+    }
+
+    handleClear = () => {
+        this.setState({
+            items: []
+        })
+        // console.log(this.state.willBeDeleted)
+    }
+
+    handleDeleteList = (e) => {
+        if(e.target.checked){
+            console.log(1)
+            this.setState({
+                willBeDeleted: [...this.state.willBeDeleted, Number(e.target.value)],
+            })  
+        }
+
+        else if(!e.target.checked){
+            console.log(0)
+            this.state.willBeDeleted.splice(this.state.deletedItems.indexOf(Number(e.target.value)) )
+        }
+    }
+
+    handleExecuteDeleteList = () => {
+        this.setState({
+            willbeDeleted: this.state.willBeDeleted.sort(function(a,b){return a-b}) //sort array biar gk acak
+        })
+
+        for (var i = this.state.willBeDeleted.length -1; i >= 0; i--)
+            this.state.items.splice(this.state.willBeDeleted[i],1);
+        
+        document.querySelectorAll('input[type=checkbox]').forEach( cekbox => cekbox.checked = false );
+        this.setState({ //deleteditems temp
+        willBeDeleted: []
+        })
+    }
+
+  render() {
+    return(
+        <div style={bodystyle}>
+            <form style = {formstyle} onSubmit={this.handleSubmit}>
+            <div className="form-group">
+                <label htmlFor="exampleInputEmail1">Input data</label>
+                <input required className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Type here"
+                value={this.state.todoItem} onChange={this.handleChange}
+                />
+                {/* <small id="emailHelp" className="form-text text-muted">We'll never share your data with anyone else.</small> */}
+            </div>
+            <button type="submit" className="btn btn-primary">Add</button>
+            <button type="button" className="btn btn-danger ml-3" onClick={this.handleExecuteDeleteList}>Delete</button>
+            <button type="button" className="btn btn-secondary ml-3" onClick={this.handleClear}>Clear All</button>
+            {/* <List items = {this.state.items}/> */}
+            <br/>
+            <br/>
+            {this.state.items.map((item, index) => //map buat loop, index buat bedain item
+            <li key={index} className="list-group-item"> 
+                <input type="checkbox" value={index} onChange={this.handleDeleteList}/>
+                &nbsp; {index} 
+                &nbsp; {item}
+            </li>)}
+
+            </form>
+            
+            <footer style={footerstyle}><small>&copy; daps {tgl.getFullYear()}</small></footer>
+            </div>
+    )
+  }
+}
+
+const formstyle = {
+    maxWidth: '500px',
+    margin: 'auto',
+    marginTop: '100px',
+}
+
+const bodystyle = {
+    minHeight: '500px'
+}
+
+const footerstyle = {
+  width: '100%',
+  position: 'absolute',
+  bottom: 0,
+  color: 'white',
+  textAlign: 'center',
+  background: 'black'
+}
+
+var tgl = new Date();
+
+ReactDOM.render(<Hello />, document.getElementById('mydiv'))
+</script>
+
+</body>
+</html>
